@@ -18,9 +18,13 @@ app.get('/products', async(req, res)=>{
     
     let productos = await manager.getProducts();
 
-    res.send({
-        productos
-    })
+    let limit = req.query.limit
+
+    if(!limit) return res.send({productos})
+
+    let limitproducts = productos.slice(0, limit)
+    return res.send({limitproducts})
+   
 })
 
 app.get('/products/:idProduct', async (req, res)=>{
@@ -33,3 +37,4 @@ app.get('/products/:idProduct', async (req, res)=>{
         productoFiltrado
     })
 })
+
