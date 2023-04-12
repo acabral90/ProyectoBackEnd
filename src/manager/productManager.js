@@ -15,13 +15,79 @@ export default class ProductManager {
         }
     }
 
-    getProductById = async (productId) =>{
+    getProductById = async (pid) =>{
 
         const products = await this.getProducts();
         
-        let filterProduct = products.filter(product => product.id == productId)
+        let filterProduct = products.filter(product => product.id == pid)
 
         return filterProduct
+
+    }
+
+    addProducts = async (product) =>{
+
+        const products = await this.getProducts();
+
+        const {title, description, price, code, stock, category} = product
+
+        
+        if(products.length === 0){
+            product.id = 1
+        }else{
+            product.id = products[products.length-1].id+1;
+        };
+
+        if(!title || !description || !code || !price || !stock || !category){
+            
+            return ('Se deben completar todos los campos')
+
+        }else{
+            products.push(product);
+        
+            await fs.promises.writeFile(path, JSON.stringify(products, null, '\t'))
+        
+            return product
+        } 
+
+    }
+
+    updateProduct = async (product, pid) =>{
+        const {title, description, price, thumbnail, code, stock} = product
+
+        const products = await this.getProducts();
+        
+        let findProduct = products.find(item => item.id == pid)
+
+        if(title){
+            findProduct.title = title
+        }if(description){
+            findProduct.description = description
+        }if(price){
+            findProduct.price = price
+        }if(thumbnail){
+            findProduct.thumbnail = thumbnail
+        }if(code){
+            findProduct.code = code
+        }if(stock){
+            findProduct.stock = stock
+        };
+
+        await fs.promises.writeFile(path, JSON.stringify(products, null, '\t'))
+        return findProduct
+    }
+
+    deleteProduct = async (productId) =>{
+
+        const products = await this.getProducts();
+
+        let productIndex = products.findIndex((items) => items.id == productId)
+
+        let productoEliminado = products.splice(productIndex, 1)
+
+        await fs.promises.writeFile(path, JSON.stringify(products, null, '\t'))
+    
+        return productoEliminado
 
     }
 
