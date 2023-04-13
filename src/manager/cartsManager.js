@@ -40,36 +40,40 @@ export default class CartsManager {
         carts.push(cart);
         
         await fs.promises.writeFile(path, JSON.stringify(carts, null, '\t'));
-        return carts
-
-    }
-
-    addProduct = async (cid, pid) =>{
-
-        const id = parseInt(pid)
-
-        const carts = await this.getCarts();
-
-        const cart = await this.getCartsById(cid);
-
-        let arrayProducts = cart.products
-
-        let product = arrayProducts.find(product => product.product == pid)
-        console.log(product)
-
-        if(product){
-            product.quantity =+1
-        }else{
-            const newProduct = {
-                product : id,
-                quantity : 1
-            };
-            arrayProducts.push(newProduct)
-        }
-        console.log(arrayProducts)
-        await fs.promises.writeFile(path, JSON.stringify(carts, null, '\t'));
         return cart
 
     }
 
+    addProduct = async (cid, pid) => {
+        const id = parseInt(pid);
+        
+        
+        const cart = await this.getCartsById(cid);
+        if (!cart) {
+            return `cart with id ${cid} not found`;
+        }
+        
+        let cartProducts = cart.products;
+    
+        let product = cartProducts.find((product) => product.id === id);
+    
+        if (product) {
+            product.quantity++;
+        } else {
+            cartProducts.push({
+            id,
+            quantity: 1,
+            });
+        }
+       
+        const carts = await this.getCarts();
+        const cartIndex = carts.findIndex((c) => c.id === parseInt(cid));
+        carts[cartIndex] = cart;
+    
+    
+        await fs.promises.writeFile(path, JSON.stringify(carts, null, "\t"));
+        return cart;
+    };
+
 }
+
